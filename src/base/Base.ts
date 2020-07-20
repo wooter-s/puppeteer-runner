@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import puppeteer, { ClickOptions } from 'puppeteer'
 import { trimAll } from "./util/string";
 import { LaunchOptions } from "puppeteer";
 
@@ -30,9 +30,11 @@ export enum BaseSelectorType {
     TAB = ".ant-tabs-tab[role='tab']"
 }
 
-// TODO extends 深度学习
 /**
- * TODO 1.调度机制（包含流程控制） 2.数据验证 3.错误报告生成
+ * TODO
+ * 1.调度机制 ok
+ * 2.数据验证
+ * 3.错误报告生成 ok
  */
 export abstract class Base {
     // @ts-ignore
@@ -41,11 +43,17 @@ export abstract class Base {
     browser: puppeteer.Browser;
     isInitFinish: boolean = false;
     runner?: Function;
+    timeout: number = 5000;
     protected constructor(launchOptions?:LaunchOptions) {
         this.init(launchOptions)
     }
 
     private init = async (launchOptions?:LaunchOptions) => {
+
+        if (launchOptions?.timeout) {
+            this.timeout = launchOptions.timeout;
+        }
+
         const browser = await puppeteer.launch({
             defaultViewport: null, // view适配到浏览器窗口大小
             headless: false,
@@ -56,10 +64,12 @@ export abstract class Base {
             executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             userDataDir: '/Users/dasouche/Library/Application\\ Support/Google/Chrome/', // 设置缓存文件
             // devtools: true,
-            timeout: 50000,
+            timeout: this.timeout,
             devtools: true,
             ...launchOptions,
         });
+
+
         this.browser = browser;
         this.page = await browser.newPage();
         this.isInitFinish = true;
@@ -93,7 +103,14 @@ export abstract class Base {
         return null;
     }
 
-    public queryWithText = async (query: string, text: string, timeout:number = 10000, interval:number = 200): Promise<puppeteer.ElementHandle<Element> | null> => {
+    public click = async (query: string, options?:ClickOptions): Promise<void> => {
+        const target = await this.query(query);
+        if (target) {
+            await target.click(options);
+        }
+    }
+
+    public queryWithText = async (query: string, text: string, timeout:number = this.timeout, interval:number = 200): Promise<puppeteer.ElementHandle<Element> | null> => {
         await this.page!.waitFor(interval);
         await this.page!.waitForSelector(query);
 
