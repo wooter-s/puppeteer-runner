@@ -1,8 +1,9 @@
-import * as puppeteer from 'puppeteer'
-import { Readline } from "./src/process/readline";
+import puppeteer from 'puppeteer'
+import { Readline } from "./src";
 
 
 class Start {
+    // @ts-ignore
     page: puppeteer.Page;
     isInitFinish: boolean = false;
     isStartBeforeInit: boolean = false;

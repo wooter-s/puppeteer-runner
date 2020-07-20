@@ -1,6 +1,6 @@
 import { Response } from 'puppeteer'
 import { Base, BaseSelectorType } from "../base/Base";
-import { Readline } from "../process/readline";
+import { Readline } from "../base/util/readline";
 import { IsRecord, RecordManger } from "../base/RecordManger";
 
 

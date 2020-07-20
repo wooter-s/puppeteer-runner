@@ -1,5 +1,5 @@
-import * as puppeteer from 'puppeteer'
-import { trimAll } from "../util/string";
+import puppeteer from 'puppeteer'
+import { trimAll } from "./util/string";
 import { LaunchOptions } from "puppeteer";
 
 export enum BaseSelectorType {
@@ -45,7 +45,7 @@ export abstract class Base {
         this.init(launchOptions)
     }
 
-    private init = async ( launchOptions?:LaunchOptions) => {
+    private init = async (launchOptions?:LaunchOptions) => {
         const browser = await puppeteer.launch({
             defaultViewport: null, // view适配到浏览器窗口大小
             headless: false,

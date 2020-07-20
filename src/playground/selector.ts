@@ -1,5 +1,5 @@
 import { Base } from "../base/Base";
-import { querySelectorWithText } from "../util/selector";
+import { querySelectorWithText } from "../base/util/selector";
 
 class Selector extends Base {
     constructor() {

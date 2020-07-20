@@ -1,5 +1,5 @@
 import { Base, BaseSelectorType } from "../base/Base";
-import { Readline } from "../process/readline";
+import { Readline } from "../base/util/readline";
 
 /**
  * TODO 1.调度机制（包含流程控制） 2.数据验证 3.错误报告生成
