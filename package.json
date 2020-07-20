@@ -1,19 +1,31 @@
 {
-  "name": "auto-e2e-test",
-  "version": "1.0.0",
+  "name": "puppeteer-runner",
+  "version": "0.0.9",
   "description": "",
-  "main": "index.js",
+  "private": false,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf dist/* && rollup -c"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/dateformat": "^3.0.1",
+    "@types/puppeteer": "^2.0.1",
+    "dateformat": "^3.0.3",
     "puppeteer": "^3.3.0",
+    "tracer": "^1.1.2",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
-    "@types/puppeteer": "^2.0.1"
+    "rollup": "^2.22.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.27.1"
   }
 }

@@ -9,7 +9,6 @@ import { Readline } from "../process/readline";
 class StandardSelector extends Base {
     constructor() {
         super();
-        this.init(this.start)
     }
 
     start = async () => {
@@ -144,7 +143,7 @@ class StandardSelector extends Base {
 }
 
 const standardSelector = new StandardSelector();
-standardSelector._start()
+standardSelector.run(standardSelector.start)
 
 
 

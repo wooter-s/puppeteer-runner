@@ -1,5 +1,6 @@
 import * as puppeteer from 'puppeteer'
 import { trimAll } from "../util/string";
+import { LaunchOptions } from "puppeteer";
 
 export enum BaseSelectorType {
     INPUT = "input.ant-input",
@@ -34,15 +35,17 @@ export enum BaseSelectorType {
  * TODO 1.调度机制（包含流程控制） 2.数据验证 3.错误报告生成
  */
 export abstract class Base {
+    // @ts-ignore
     page: puppeteer.Page;
+    // @ts-ignore
     browser: puppeteer.Browser;
     isInitFinish: boolean = false;
-    isStartBeforeInit: boolean = false;
-    protected constructor() {
-        // this.init()
+    runner?: Function;
+    protected constructor(launchOptions?:LaunchOptions) {
+        this.init(launchOptions)
     }
 
-    public init = async (cb: Function) => {
+    private init = async ( launchOptions?:LaunchOptions) => {
         const browser = await puppeteer.launch({
             defaultViewport: null, // view适配到浏览器窗口大小
             headless: false,
@@ -51,38 +54,48 @@ export abstract class Base {
                 // '--start-fullscreen', // 这个是全屏
             ],
             executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            userDataDir: '/Users/dasouche/Library/Application\\ Support/Google/Chrome', // 设置缓存文件
+            userDataDir: '/Users/dasouche/Library/Application\\ Support/Google/Chrome/', // 设置缓存文件
             // devtools: true,
             timeout: 50000,
+            devtools: true,
+            ...launchOptions,
         });
         this.browser = browser;
         this.page = await browser.newPage();
-        // this.addEventListener();
         this.isInitFinish = true;
-        if (this.isStartBeforeInit) {
-            cb()
-        }
+        this.runner && this.runner();
     }
-    //
-    // private addEventListener() {
-    //     this.page.on("response", async (response) => {
-    //         response.
-    //         const result = await response.text();
-    //         console.log('------> result', result);
-    //     })
-    // }
 
-    public _start = async () => {
-        if (!this.isInitFinish) {
+    public run = async (cb: Function) => {
+        if (this.isInitFinish) {
+            cb();
+        } else {
             console.info('初始化完成后启动浏览器');
-            this.isStartBeforeInit = true;
-            return;
+            this.runner = cb;
         }
+    };
+
+
+    public closePage = async () => {
+        await this.page?.close({ runBeforeUnload: true });
     }
 
-    public queryWithText = async (query: string, text: string, timeout:number = 10000, interval:number = 200): Promise<puppeteer.ElementHandle<Element>> => {
-        await this.page.waitFor(interval);
-        await this.page.waitForSelector(query);
+    public closeBrowser = async () => {
+        await this.closePage();
+        await this.browser?.close()
+    }
+
+    public query = async (query: string) : Promise<puppeteer.ElementHandle<Element> | null> => {
+        await this.page!.waitForSelector(query);
+        if (this.page) {
+            return await this.page.$(query);
+        }
+        return null;
+    }
+
+    public queryWithText = async (query: string, text: string, timeout:number = 10000, interval:number = 200): Promise<puppeteer.ElementHandle<Element> | null> => {
+        await this.page!.waitFor(interval);
+        await this.page!.waitForSelector(query);
 
         // 超时
         if (timeout < 0) {
@@ -90,7 +103,7 @@ export abstract class Base {
             console.error('------> 超时');
             return null;
         }
-        const elements = await this.page.$$(query);
+        const elements = await this.page!.$$(query);
         if (!elements || elements.length === 0) {
             console.log('------> 没有查找到元素', query, text);
         }
@@ -110,14 +123,14 @@ export abstract class Base {
             }
         }
 
-        return new Promise<puppeteer.ElementHandle<Element>>( async(res, rej) => {
+        return new Promise<puppeteer.ElementHandle<Element> | null>( async(res, rej) => {
             const result = await this.queryWithText(query, text, timeout - interval, interval);
             res(result);
         })
     }
 
     // 查询 唯一的父节点,在获取子节点；子节点设计成没有标识，因为如果有唯一标识，应该直接调用 queryWithText
-    public queryChildWithParentText = async (parentQuery: string, parentText: string, query: string, ): Promise<puppeteer.ElementHandle<Element>> => {
+    public queryChildWithParentText = async (parentQuery: string, parentText: string, query: string, ): Promise<puppeteer.ElementHandle<Element> | null> => {
         const parentElements = await this.queryWithText(parentQuery, parentText);
         if (parentElements) {
             const targetElement = await parentElements.$(query);

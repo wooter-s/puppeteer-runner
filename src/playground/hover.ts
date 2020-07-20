@@ -3,7 +3,6 @@ import { Base, BaseSelectorType } from "../base/Base";
 class Hover extends Base {
     constructor() {
         super();
-        this.init(this.start)
     }
 
     start = async () => {
@@ -24,4 +23,4 @@ class Hover extends Base {
 }
 
 const hover = new Hover();
-hover._start()
+hover.run(hover.start);

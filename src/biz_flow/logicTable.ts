@@ -10,7 +10,6 @@ export class LogicTable {
                 // 点击展开按钮
                 this.page.click(".ant-tree-switcher"),
                 //
-
             ],
             result: this.page.click(".ant-tree-switcher")
         }

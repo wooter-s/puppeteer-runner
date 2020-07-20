@@ -1,16 +1,17 @@
+import { Response } from 'puppeteer'
 import { Base, BaseSelectorType } from "../base/Base";
 import { Readline } from "../process/readline";
+import { IsRecord, RecordManger } from "../base/RecordManger";
 
 
 class StandardSelector extends Base {
     constructor() {
         super();
-        this.init(this.start)
     }
 
     start = async () => {
-        this.addEventListener()
         await this.page.goto('http://f2e.souche.com/projects/data-fe/data-standard-center/index.html#/standard');
+        this.addEventListener()
         // 验证码登录
         // await this.verificationCodeLogin();
 
@@ -18,22 +19,14 @@ class StandardSelector extends Base {
         await this.ddlImport();
     }
 
-    private addEventListener() {
-        this.page.on("response", async (response) => {
-            try {
-                if (response.url().startsWith('http://shangyang.dasouche-inc.net')) {
-                    console.log('------> response.ok()', response.ok(), response.url());
+    private isRecord: IsRecord = (response: Response): boolean => {
+        const url = response.url();
+        return url.startsWith('http://shangyang.dasouche-inc.net');
+    }
 
-                    if (response.ok()) {
-                        response.buffer().then((re) => {
-                            console.log('------> buffer', JSON.parse(re.toString('utf-8')));
-                        })
-                    }
-                }
-            } catch (e) {
-                console.log('------> response e', e);
-            }
-        })
+    private addEventListener() {
+        const recordManger = new RecordManger(this.page, this.isRecord);
+        this.page.on("response", recordManger.handle)
     }
 
     // DDL导入
@@ -180,7 +173,7 @@ class StandardSelector extends Base {
 }
 
 const standardSelector = new StandardSelector();
-standardSelector._start()
+standardSelector.run(standardSelector.start)
 
 
 

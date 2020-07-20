@@ -4,7 +4,6 @@ import { querySelectorWithText } from "../util/selector";
 class Selector extends Base {
     constructor() {
         super();
-        this.init(this.start)
     }
 
     start = async () => {
@@ -47,4 +46,4 @@ class Selector extends Base {
 }
 
 const select = new Selector();
-select._start()
+select.run(select.start)
