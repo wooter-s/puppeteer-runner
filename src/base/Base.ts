@@ -1,6 +1,7 @@
 import puppeteer, { ClickOptions, LaunchOptions } from 'puppeteer'
 import { trimAll } from "./util/string";
 import { RecordManger } from "./RecordManger";
+import * as os from "os";
 
 export enum BaseSelectorType {
     INPUT = "input.ant-input",
@@ -54,6 +55,7 @@ export abstract class Base {
         if (launchOptions?.timeout) {
             this.timeout = launchOptions.timeout;
         }
+        const homedir = os.homedir()
         const browser = await puppeteer.launch({
             defaultViewport: null, // view适配到浏览器窗口大小
             headless: false,
@@ -63,7 +65,7 @@ export abstract class Base {
                 // '--whitelisted-extension-id=pcpjhakpbojbpcmlcmaefndlnfmdhifj', // TODO 插件支持
             ],
             executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            userDataDir: '/Users/dasouche/Library/Application\\ Support/Google/Chrome/', // 设置缓存文件
+            userDataDir: `${homedir}/Library/Application\\ Support/Google/Chrome/`, // 设置缓存文件
             // devtools: true,
             timeout: this.timeout,
             devtools: true,
