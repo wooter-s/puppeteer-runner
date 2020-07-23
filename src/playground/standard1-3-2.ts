@@ -26,7 +26,7 @@ class StandardSelector extends Base {
 
     private addEventListener() {
         const recordManger = new RecordManger(this.page, this.isRecord);
-        this.page.on("response", recordManger.handle)
+        this.page.on("response", recordManger.handleResponse)
     }
 
     // DDL导入

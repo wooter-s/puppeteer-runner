@@ -23,11 +23,15 @@ export class ResponseRecorder {
         })
     }
 
-    recordLog = async (url: string, result: BizResponse) => {
-        if (result.success) {
-            // this.logger.log(url, JSON.stringify(result));
+    recordLog = async (result: BizResponse | Record<string, string>, ...args: any[]) => {
+        if (result.data) {
+            if (result.success) {
+                this.logger.log(...args, JSON.stringify(result));
+            } else {
+                this.logger.error(...args, JSON.stringify(result));
+            }
         } else {
-            this.logger.error(url, JSON.stringify(result));
+            this.logger.log(...args, JSON.stringify(result));
         }
     }
 }

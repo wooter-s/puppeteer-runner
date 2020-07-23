@@ -1,6 +1,6 @@
-import puppeteer, { ClickOptions } from 'puppeteer'
+import puppeteer, { ClickOptions, LaunchOptions } from 'puppeteer'
 import { trimAll } from "./util/string";
-import { LaunchOptions } from "puppeteer";
+import { RecordManger } from "./RecordManger";
 
 export enum BaseSelectorType {
     INPUT = "input.ant-input",
@@ -44,6 +44,7 @@ export abstract class Base {
     isInitFinish: boolean = false;
     runner?: Function;
     timeout: number = 5000;
+    recordManger: RecordManger | undefined;
     protected constructor(launchOptions?:LaunchOptions) {
         this.init(launchOptions)
     }
@@ -53,13 +54,13 @@ export abstract class Base {
         if (launchOptions?.timeout) {
             this.timeout = launchOptions.timeout;
         }
-
         const browser = await puppeteer.launch({
             defaultViewport: null, // view适配到浏览器窗口大小
             headless: false,
             args: [
                 '--process-per-site',
                 // '--start-fullscreen', // 这个是全屏
+                // '--whitelisted-extension-id=pcpjhakpbojbpcmlcmaefndlnfmdhifj', // TODO 插件支持
             ],
             executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             userDataDir: '/Users/dasouche/Library/Application\\ Support/Google/Chrome/', // 设置缓存文件
@@ -85,6 +86,15 @@ export abstract class Base {
         }
     };
 
+    public nodeRunners = async (nodes: ((base: Base) => Promise<void>)[]) => {
+        for(const n of nodes) {
+            try {
+                await n(this)
+            } catch (e) {
+                this.recordManger?.record(['流程错误', n.name, e])
+            }
+        }
+    }
 
     public closePage = async () => {
         await this.page?.close({ runBeforeUnload: true });
@@ -96,7 +106,7 @@ export abstract class Base {
     }
 
     public query = async (query: string) : Promise<puppeteer.ElementHandle<Element> | null> => {
-        await this.page!.waitForSelector(query);
+        await this.page!.waitForSelector(query, { timeout: this.timeout, visible: true });
         if (this.page) {
             return await this.page.$(query);
         }
@@ -104,6 +114,7 @@ export abstract class Base {
     }
 
     public click = async (query: string, options?:ClickOptions): Promise<void> => {
+        await this.page.waitFor(300);
         const target = await this.query(query);
         if (target) {
             await target.click(options);
@@ -112,8 +123,7 @@ export abstract class Base {
 
     public queryWithText = async (query: string, text: string, timeout:number = this.timeout, interval:number = 200): Promise<puppeteer.ElementHandle<Element> | null> => {
         await this.page!.waitFor(interval);
-        await this.page!.waitForSelector(query);
-
+        await this.page!.waitForSelector(query, { timeout: this.timeout });
         // 超时
         if (timeout < 0) {
             // TODO 记录现场
