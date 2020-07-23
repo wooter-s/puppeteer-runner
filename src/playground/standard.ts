@@ -1,21 +1,12 @@
 import { Base, BaseSelectorType } from "../base/Base";
 import { Readline } from "../base/util/readline";
 
-/**
- * TODO 1.调度机制（包含流程控制） 2.数据验证 3.错误报告生成
- */
-
-
 class StandardSelector extends Base {
     constructor() {
         super();
     }
 
     start = async () => {
-
-        // await this.page.goto("http://f2e.souche.com/projects/data-fe/data-standard-center/index.html");
-        // return;
-        this.addEventListener()
         await this.page.goto('http://localhost:3000/#/modelCst');
 
         // 验证码登录
@@ -25,31 +16,6 @@ class StandardSelector extends Base {
         // await this.flowLogicTableUpdate();
 
         await this.flowCreateLogicTable();
-    }
-
-    private addEventListener() {
-        this.page.on("response", async (response) => {
-            try {
-                if (response.url().startsWith('http://shangyang.dasouche-inc.net')) {
-                    console.log('------> response.ok()', response.ok(), response.url());
-
-                    if (response.ok()) {
-                        response.buffer().then((re) => {
-                            console.log('------> buffer', JSON.parse(re.toString('utf-8')));
-                        })
-                        // const buffer = await response.buffer()
-                        // const result = JSON.parse(buffer.toString('utf-8'));
-                        // console.log('------> result', result);
-                        // const result: any = await response.json();
-                        // if (!result.success) {
-                        //     console.log('------> result', result, result.success);
-                        // }
-                    }
-                }
-            } catch (e) {
-                console.log('------> response e', e);
-            }
-        })
     }
 
     // 添加字段
