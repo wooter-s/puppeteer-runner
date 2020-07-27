@@ -56,7 +56,6 @@ export class RecordManger {
                 if (postData) {
                     await this.responseRecorder.recordLog(
                         result,
-                        'response\n',
                         method + '\n',
                         url + '\n',
                         postData + '\n',
@@ -64,7 +63,6 @@ export class RecordManger {
                 } else {
                     await this.responseRecorder.recordLog(
                         result,
-                        'response',
                         method,
                         url,
                     );
@@ -87,7 +85,7 @@ export class RecordManger {
             const method = request.method();
             if (this.isRecordRequest(request) && method !== "OPTIONS") {
                 const result = await request.headers();
-                await this.responseRecorder.recordLog(result, 'request', method, url);
+                await this.responseRecorder.recordLog(result, method, url);
             }
         } catch (e) {
             console.log('------> response e', e);
