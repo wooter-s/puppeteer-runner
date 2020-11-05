@@ -3,6 +3,7 @@ import { table } from "./flow/standard/table/table";
 import { Base, IsRecord, RecordManger } from "..";
 import { dbClickWithHover } from "./flow/test/dbclick-antd";
 import { TestNode } from "./flow/withTextTestNode";
+import { TreeSelectNode } from "./flow/test/treeSelect";
 
 class Test extends Base {
     constructor() {
@@ -25,7 +26,14 @@ class Test extends Base {
         // // await table(this);
         // await dbClickWithHover(this);
         // await this.closeBrowser()
-        await TestNode(this)
+        await this.nodeRunners(
+            [
+                // TestNode,
+                TreeSelectNode
+            ]
+        )
+        // await this.closeBrowser()
+
     }
 }
 

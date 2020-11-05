@@ -23,7 +23,7 @@ class StandardSelector extends Base {
         await this.clickQueryWithText(BaseSelectorType.BUTTON, "添加字段")
         await this.page.waitFor(300)
 
-        const inputRow = await this.page.$$(`${BaseSelectorType.TABLE_ITEM} ${BaseSelectorType.INPUT}`);
+        const inputRow = await this.page.$$(`${BaseSelectorType.TABLE_ITEM} ${BaseSelectorType.ANT_INPUT}`);
         if (inputRow[0]) {
             await inputRow[0].type("testField")
         }
@@ -33,7 +33,7 @@ class StandardSelector extends Base {
 
         await this.page.click(`${BaseSelectorType.TABLE_ITEM} ${BaseSelectorType.SELECT}`)
         await this.page.waitFor(300);
-        await this.clickQueryWithText(BaseSelectorType.SELECT_ITEM, "INT")
+        await this.clickQueryWithText(BaseSelectorType.ANT_SELECT_DROPDOWN_MENU_ITEM, "INT")
     }
 
     private async flowLogicTableUpdate() {
@@ -71,9 +71,9 @@ class StandardSelector extends Base {
     }
 
     private async flowCreateLogicTable() {
-        await this.clickQueryWithText(BaseSelectorType.MENU_ITEM, "表管理");
+        await this.clickQueryWithText(BaseSelectorType.ANT_MENU_ITEM, "表管理");
 
-        await this.clickQueryWithText(BaseSelectorType.MENU_ITEM, "模型");
+        await this.clickQueryWithText(BaseSelectorType.ANT_MENU_ITEM, "模型");
 
         await this.clickQueryWithText(BaseSelectorType.DIRECT_TREE, "test——2");
 
@@ -82,8 +82,8 @@ class StandardSelector extends Base {
 
         await this.clickQueryWithText(BaseSelectorType.DROPDOWN_SELECT_MENU_ITEM, "新增表");
 
-        await this.page.type(`${BaseSelectorType.INPUT}[placeholder='请输入表名']`, 'test_table_name');
-        await this.page.type(`${BaseSelectorType.INPUT}[placeholder='请输入表中文名']`, '测试表名');
+        await this.page.type(`${BaseSelectorType.ANT_INPUT}[placeholder='请输入表名']`, 'test_table_name');
+        await this.page.type(`${BaseSelectorType.ANT_INPUT}[placeholder='请输入表中文名']`, '测试表名');
 
         await this.flowLogicTableAddField();
 
