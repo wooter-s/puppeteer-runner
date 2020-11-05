@@ -20,7 +20,6 @@ export class Readline {
     static question =  async(query: string): Promise<string> => {
         return new Promise((resolve => {
             Readline.rl.question(query, async (answer) => {
-                console.log('------> answer', answer);
                 resolve(answer)
             })
         }))

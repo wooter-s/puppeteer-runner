@@ -2,6 +2,7 @@ import puppeteer, { ClickOptions, LaunchOptions } from 'puppeteer'
 import { trimAll } from "./util/string";
 import { RecordManger } from "./RecordManger";
 import * as os from "os";
+import { Readline } from "./util/readline";
 
 interface BaseSelectorInterface {
     displayName: string;
@@ -433,6 +434,16 @@ export abstract class Base {
     };
 
     public nodeRunners = async (nodes: ((base: Base) => Promise<void>)[]) => {
+        const cookie = await this.page.cookies();
+        if (cookie) {
+            const token = cookie.find((c) => c.name === '_security_token_inc');
+            if (!token) {
+                await this.verificationCodeLogin()
+            }
+        } else {
+            await this.verificationCodeLogin()
+        }
+
         for(const n of nodes) {
             try {
                 await n(this)
@@ -562,5 +573,28 @@ export abstract class Base {
         if (element) {
             await element.type(input)
         }
+    }
+
+    public verificationCodeLogin = async () => {
+
+        const verificationLoginA = await this.queryWithText('a', '验证码登录');
+        await verificationLoginA?.click();
+        await this.page.waitForNavigation();
+
+        // 输入用户名
+        const mobile = await Readline.question("请输入获取验证码手机号: ");
+
+        await this.page.type("#fg-username", mobile);
+        // 勾选发送验证码到钉钉
+        await this.page.click("#beleive-ckb");
+        // 点击获取验证码
+        await this.page.click("#msg_code");
+
+        const answer = await Readline.question("请输入验证码: ");
+        // 输入验证码
+        await this.page.type("#fg-code-verify", answer);
+
+        // 点击确认按钮
+        await this.page.click("#fgpwd-submit-btn");
     }
 }
